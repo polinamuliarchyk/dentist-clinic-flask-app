@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Appointment - DentalCare</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="{{ url_for('client.index') }}" class="logo">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                        <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                        <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                    </svg>
+                </div>
+                <span class="logo-text">DentalCare</span>
+            </a>
+
+            <nav class="nav">
+                <a href="{{ url_for('service.show_services') }}" class="nav-link">Services</a>
+                <a href="{{ url_for('dentist.show_dentists') }}" class="nav-link">Dentists</a>
+                <a href="{{ url_for('visit.visit_history') }}" class="nav-link">Visit History</a>
+            </nav>
+
+            <div class="auth-buttons">
+                <span style="margin-right: 15px; color: var(--primary);">Hello, {{ client.name }}!</span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-outline">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="services-page" style="padding-bottom: 3rem;">
+        <div style="max-width: 900px; margin: 0 auto;">
+            <div class="text-center mb-4">
+                <svg class="confirmation-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 64px; height: 64px; color: #4CAF50; margin: 0 auto 1rem; display: block;">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                <h1 class="page-title" style="margin-bottom: 0.5rem;">Confirm Your Appointment</h1>
+                <p class="page-subtitle">Please review your booking details</p>
+            </div>
+
+            <div class="card" style="background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                <div class="card-content" id="confirmationContent">
+
+                    <div class="detail-item" style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <div class="detail-icon" style="background: #D0E3ED; padding: 12px; border-radius: 12px; color: #073F88;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="detail-label" style="font-size: 0.875rem; color: rgba(26,26,26,0.6);">Appointment Date</div>
+                            <div class="detail-value" style="font-size: 1.25rem; font-weight: 700; color: #073F88;">{{ visit_date }}</div>
+                        </div>
+                    </div>
+
+                    <div class="detail-item" style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <div class="detail-icon" style="background: #D0E3ED; padding: 12px; border-radius: 12px; color: #073F88;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="detail-label" style="font-size: 0.875rem; color: rgba(26,26,26,0.6);">Dentist</div>
+                            <div class="detail-value" style="font-size: 1.25rem; font-weight: 700; color: #073F88;">{{ dentist.name }} {{ dentist.lastname }}</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-section" style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #eee;">
+                        <h3 class="summary-title" style="margin-bottom: 1.5rem; color: #073F88;">Selected Services</h3>
+                        {% for service in services %}
+                            <div class="service-summary-item" style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                                <div>
+                                    <div style="font-weight: 500; color: #073F88;">{{ service.name }}</div>
+                                    <div style="font-size: 0.875rem; color: rgba(26, 26, 26, 0.7);">{{ service.description }}</div>
+                                </div>
+                                <div style="font-weight: 700; color: #073F88;">{{ "%.2f"|format(service.price) }} PLN</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="total-section" style="margin-top: 2rem; padding: 1.5rem; background: #073F88; border-radius: 12px; color: white; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <span class="total-label" style="font-size: 1.25rem; font-weight: 400;">Total Price</span>
+                        </div>
+                        <span class="total-price" style="font-size: 1.75rem; font-weight: 700;">{{ "%.2f"|format(total_price) }} PLN</span>
+                    </div>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('visit.verify_data') }}" class="action-buttons" style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: center;">
+                <button name="action" value="cancel" type="submit" class="btn btn-outline btn-lg" style="min-width: 200px; padding: 1rem;">Cancel</button>
+                <button name="action" value="confirm" type="submit" class="btn btn-primary btn-lg" style="min-width: 200px; padding: 1rem;">Confirm Appointment</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

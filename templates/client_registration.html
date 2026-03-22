@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - DentalCare</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/styles.css">
+</head>
+<body>
+    <div class="auth-page">
+        <div class="card auth-card">
+            <div class="card-header">
+                <h2 class="card-title">Create Account</h2>
+                <p class="card-description">Fill in your information to register</p>
+            </div>
+            <div class="card-content">
+                <form id="registerForm" method="POST" action="{{ url_for('client.register_client') }}">
+
+                    {% with messages = get_flashed_messages() %}
+                      {% if messages %}
+                        {% for message in messages %}
+                          <div class="form-error" style="display: block; margin-bottom: 15px;">{{ message }}</div>
+                        {% endfor %}
+                      {% endif %}
+                    {% endwith %}
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="name">Name</label>
+                            <input class="form-input" type="text" id="name" name="name" placeholder="John" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="lastname">Surname</label>
+                            <input class="form-input" type="text" id="lastname" name="lastname" placeholder="Doe" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="phone">Phone Number</label>
+                            <input class="form-input" type="tel" id="phone" name="phone" placeholder="234 567 890" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="date_of_birth">Date of Birth</label>
+                            <input class="form-input" type="date" id="date_of_birth" name="date_of_birth" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="street">Street Address</label>
+                        <input class="form-input" type="text" id="street" name="street" placeholder="123 Main Street" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="city">City</label>
+                            <input class="form-input" type="text" id="city" name="city" placeholder="New York" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="zipcode">Zip Code</label>
+                            <input class="form-input" type="text" id="zipcode" name="zipcode" placeholder="10001" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="password">Password</label>
+                            <input class="form-input" type="password" id="password" name="password" placeholder="Enter password" required>
+                            <div class="form-error" id="passwordError"></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="confirmPassword">Confirm Password</label>
+                            <input class="form-input" type="password" id="confirmPassword" placeholder="Confirm password" required>
+                            <div class="form-error" id="confirmPasswordError"></div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Register</button>
+                </form>
+            </div>
+            <div class="card-footer">
+                <p style="font-size: 0.875rem; color: rgba(26, 26, 26, 0.7);">
+                    Already have an account?
+                    <a href="{{ url_for('auth.login') }}" style="color: var(--primary); text-decoration: none;">Login here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+            const confirmPasswordError = document.getElementById('confirmPasswordError');
+            const passwordError = document.getElementById('passwordError');
+
+            confirmPasswordError.textContent = '';
+            passwordError.textContent = '';
+            confirmPassword.classList.remove('error');
+            password.classList.remove('error');
+
+            let hasError = false;
+
+            if (password.value !== confirmPassword.value) {
+                confirmPasswordError.textContent = 'Passwords do not match';
+                confirmPassword.classList.add('error');
+                hasError = true;
+            }
+
+            if (password.value.length < 6) {
+                passwordError.textContent = 'Password must be at least 6 characters';
+                password.classList.add('error');
+                hasError = true;
+            }
+
+            if (hasError) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>

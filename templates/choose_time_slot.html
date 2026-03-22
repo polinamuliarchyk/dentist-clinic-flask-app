@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Dentist & Date - DentalCare</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="{{ url_for('client.index') }}" class="logo">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                        <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                        <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                    </svg>
+                </div>
+                <span class="logo-text">DentalCare</span>
+            </a>
+
+            <nav class="nav">
+                <a href="{{ url_for('service.show_services') }}" class="nav-link">Services</a>
+                <a href="{{ url_for('dentist.show_dentists') }}" class="nav-link">Dentists</a>
+                {% if session.get('client_id') %}
+                    <a href="{{ url_for('visit.visit_history') }}" class="nav-link">Visit History</a>
+                {% endif %}
+            </nav>
+
+            <div class="auth-buttons">
+                {% if session.get('client_id') %}
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-outline">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Login</a>
+                    <a href="{{ url_for('client.client_registration') }}" class="btn btn-primary">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <div class="services-page">
+        <div class="page-header">
+            <h1 class="page-title">Select Dentist & Date</h1>
+            <p class="page-subtitle">Choose your preferred dentist and appointment date</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('visit.select_date_slot') }}" id="bookingForm">
+            <input type="hidden" name="dentist_id" id="hiddenDentistId">
+            <input type="hidden" name="visit_date" id="hiddenVisitDate">
+
+            <div style="max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 8rem;">
+                <div class="card">
+                    <div class="card-content">
+                        <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--primary); margin-bottom: 1.5rem;">Select Dentist</h2>
+                        <div class="select">
+                            <div class="select-trigger" id="dentistTrigger">
+                                <span id="dentistValue">Choose a dentist</span>
+                                <span>▼</span>
+                            </div>
+                            <div class="select-content" id="dentistContent">
+                                {% for dentist in dentists %}
+                                    <div class="select-item"
+                                         data-id="{{ dentist.id }}"
+                                         data-name="{{ dentist.name }} {{ dentist.lastname }}"
+                                         data-exp="{{ dentist.experience }}"
+                                         onclick="selectDentist(this)">
+                                        {{ dentist.name }} {{ dentist.lastname }} ({{ dentist.experience }}y exp)
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div id="dentistProfile"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--primary); margin-bottom: 1.5rem;">Select Date</h2>
+                        <div id="calendar"></div>
+                        <div id="selectedDateDisplay"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fixed-bottom">
+                <div class="fixed-bottom-content">
+                    <a href="{{ url_for('visit.choose_visit') }}" class="btn btn-outline">Back</a>
+                    <button type="submit" class="btn btn-primary btn-lg" id="nextBtn" disabled>Next</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function selectDentist(element) {
+            const id = element.dataset.id;
+            const name = element.dataset.name;
+            const exp = element.dataset.exp;
+
+            document.getElementById('hiddenDentistId').value = id;
+
+            document.getElementById('dentistValue').textContent = name;
+            document.getElementById('dentistContent').classList.remove('open');
+
+            document.getElementById('dentistProfile').innerHTML = `
+                <div class="dentist-profile" style="margin-top: 20px; display: flex; align-items: center; gap: 15px;">
+                    <div class="dentist-avatar">
+                        <img src="https://ui-avatars.com/api/?name=${name}&background=D0E3ED&color=073F88" style="width: 60px; border-radius: 50%;">
+                    </div>
+                    <div>
+                        <h3 style="font-size: 1.25rem; font-weight: 700; color: #073F88;">${name}</h3>
+                        <p style="color: rgba(26, 26, 26, 0.7);">${exp} years of experience</p>
+                    </div>
+                </div>
+            `;
+            updateNextButton();
+        }
+
+        function renderCalendar() {
+            const calendar = document.getElementById('calendar');
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                               'July', 'August', 'September', 'October', 'November', 'December'];
+
+            let html = `<div class="calendar"><div class="calendar-header">
+                        <h3 style="text-align: center; color: #073F88; margin-bottom: 10px;">${monthNames[currentMonth]} ${currentYear}</h3>
+                        </div><div class="calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center;">`;
+
+            const dayLabels = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+            dayLabels.forEach(day => html += `<div style="font-weight: 700;">${day}</div>`);
+
+            for (let i = 0; i < firstDay; i++) html += '<div></div>';
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+                const isPast = new Date(dateStr) < today.setHours(0,0,0,0);
+
+                html += `
+                    <div class="calendar-day ${isPast ? 'disabled' : ''}"
+                         style="padding: 10px; cursor: ${isPast ? 'default' : 'pointer'}; border-radius: 4px; ${isPast ? 'opacity: 0.3' : ''}"
+                         onclick="${isPast ? '' : `selectDate('${dateStr}', this)`}">
+                        ${day}
+                    </div>
+                `;
+            }
+            calendar.innerHTML = html + '</div></div>';
+        }
+
+        function selectDate(dateStr, element) {
+            document.getElementById('hiddenVisitDate').value = dateStr;
+
+            document.querySelectorAll('.calendar-day').forEach(d => {
+                d.style.background = 'none';
+                d.style.color = 'black';
+            });
+            element.style.background = '#073F88';
+            element.style.color = 'white';
+
+            document.getElementById('selectedDateDisplay').innerHTML = `
+                <div style="margin-top: 1rem; padding: 1rem; background: rgba(208, 227, 237, 0.3); border-radius: 8px;">
+                    <p style="font-size: 0.875rem; color: rgba(26, 26, 26, 0.7);">Selected Date: <strong>${dateStr}</strong></p>
+                </div>
+            `;
+            updateNextButton();
+        }
+
+        function updateNextButton() {
+            const dentistId = document.getElementById('hiddenDentistId').value;
+            const visitDate = document.getElementById('hiddenVisitDate').value;
+            document.getElementById('nextBtn').disabled = !dentistId || !visitDate;
+        }
+
+        document.getElementById('dentistTrigger').addEventListener('click', () => {
+            document.getElementById('dentistContent').classList.toggle('open');
+        });
+
+        renderCalendar();
+    </script>
+
+    <style>
+        .select-content { display: none; position: absolute; background: white; border: 1px solid #ccc; width: 100%; z-index: 10; }
+        .select-content.open { display: block; }
+        .select-item { padding: 10px; cursor: pointer; }
+        .select-item:hover { background: #f0f0f0; }
+        .calendar-day:hover:not(.disabled) { background: #D0E3ED; }
+    </style>
+</body>
+</html>

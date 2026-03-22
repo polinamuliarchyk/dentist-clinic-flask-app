@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DentalCare - Professional Dental Services</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                        <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                        <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                    </svg>
+                </div>
+                <span class="logo-text">DentalCare</span>
+            </a>
+
+            {% if session.get('client_id') %}
+                <nav class="nav">
+                    <a href="{{ url_for('service.show_services') }}" class="nav-link">Services</a>
+                    <a href="{{ url_for('dentist.show_dentists') }}" class="nav-link">Dentists</a>
+                    <a href="{{ url_for('visit.visit_history') }}" class="nav-link">Visit History</a>
+                </nav>
+
+                <div class="auth-buttons">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Logout</a>
+                </div>
+            {% else %}
+                <nav class="nav">
+                    <a href="{{ url_for('service.show_services') }}" class="nav-link">Services</a>
+                    <a href="{{ url_for('dentist.show_dentists') }}" class="nav-link">Dentists</a>
+                </nav>
+
+                <div class="auth-buttons">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Login</a>
+                    <a href="{{ url_for('client.client_registration') }}" class="btn btn-primary">Register</a>
+                </div>
+            {% endif %}
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>Your Smile is Our Priority</h1>
+                <p>Experience world-class dental care with our team of expert dentists. Book your appointment today and take the first step towards a healthier smile.</p>
+                <a href="{{ url_for('visit.choose_visit') }}" class="btn btn-primary btn-lg">Book Appointment</a>
+            </div>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1762625570087-6d98fca29531?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBkZW50YWwlMjBjbGluaWMlMjBpbnRlcmlvcnxlbnwxfHx8fDE3NzQwNzk3ODF8MA&ixlib=rb-4.1.0&q=80&w=1080" alt="Modern dental clinic">
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section class="statistics">
+        <div class="statistics-container">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </div>
+                <div class="stat-number">10,000+</div>
+                <div class="stat-label">Satisfied Clients</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                </div>
+                <div class="stat-number">70,000+</div>
+                <div class="stat-label">Procedures Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                </div>
+                <div class="stat-number">95%</div>
+                <div class="stat-label">Positive Reviews</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section class="why-choose">
+        <div class="why-choose-container">
+            <h2 class="section-title">Why Choose DentalCare?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>Expert Team</h3>
+                    <p>Our dentists are highly qualified professionals with years of experience in providing exceptional dental care.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Modern Technology</h3>
+                    <p>We use the latest dental technology and techniques to ensure comfortable and effective treatments.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Patient Care</h3>
+                    <p>Your comfort and satisfaction are our top priorities. We provide personalized care for every patient.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

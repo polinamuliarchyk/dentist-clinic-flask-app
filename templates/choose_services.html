@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services - DentalCare</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="{{ url_for('client.index') }}" class="logo">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                        <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                        <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                    </svg>
+                </div>
+                <span class="logo-text">DentalCare</span>
+            </a>
+
+            {% if session.get('client_id') %}
+                <nav class="nav">
+                    <a href="{{ url_for('service.show_services') }}" class="nav-link">Services</a>
+                    <a href="{{ url_for('dentist.show_dentists') }}" class="nav-link">Dentists</a>
+                    <a href="{{ url_for('visit.visit_history') }}" class="nav-link">Visit History</a>
+                </nav>
+
+                <div class="auth-buttons">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Logout</a>
+                </div>
+            {% else %}
+                <nav class="nav">
+                    <a href="{{ url_for('service.show_services') }}" class="nav-link">Services</a>
+                    <a href="{{ url_for('dentist.show_dentists') }}" class="nav-link">Dentists</a>
+                </nav>
+
+                <div class="auth-buttons">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Login</a>
+                    <a href="{{ url_for('client.client_registration') }}" class="btn btn-primary">Register</a>
+                </div>
+            {% endif %}
+        </div>
+    </header>
+
+
+    <div class="services-page">
+        <div class="page-header">
+            <h1 class="page-title">Select Services</h1>
+            <p class="page-subtitle">Choose one or more services for your appointment</p>
+        </div>
+
+        <form action="{{ url_for('visit.choose_visit') }}" method="POST" id="servicesForm">
+            <div class="services-grid" id="servicesGrid">
+                {% for service in services %}
+                <div class="service-card" data-id="{{ service.id }}" onclick="toggleService(this)">
+                    <div class="service-header">
+                        <h3 class="service-name">{{ service.name }}</h3>
+                        <input type="checkbox" name="service_ids" value="{{ service.id }}" class="checkbox"
+                               onclick="event.stopPropagation(); updateDisplay();">
+                    </div>
+                    <p class="service-description">{{ service.description }}</p>
+                    <div class="service-price">{{ "%.2f"|format(service.price) }} PLN</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="fixed-bottom">
+                <div class="fixed-bottom-content">
+                    <div>
+                        <span style="color: rgba(26, 26, 26, 0.7);">Selected: </span>
+                        <span style="font-weight: 700; color: var(--primary);" id="selectedCount">0 services</span>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="nextBtn" disabled>Next</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script>
+        function toggleService(card) {
+            const checkbox = card.querySelector('.checkbox');
+            checkbox.checked = !checkbox.checked;
+
+            if (checkbox.checked) {
+                card.classList.add('selected');
+            } else {
+                card.classList.remove('selected');
+            }
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            const checkboxes = document.querySelectorAll('.checkbox:checked');
+            const count = checkboxes.length;
+            const nextBtn = document.getElementById('nextBtn');
+            const countText = document.getElementById('selectedCount');
+
+            document.querySelectorAll('.service-card').forEach(card => {
+                const cb = card.querySelector('.checkbox');
+                if (cb.checked) card.classList.add('selected');
+                else card.classList.remove('selected');
+            });
+
+            countText.textContent = `${count} service${count !== 1 ? 's' : ''} selected`;
+            nextBtn.disabled = count === 0;
+        }
+
+        updateDisplay();
+    </script>
+</body>
+</html>

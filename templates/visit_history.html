@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visit History - DentalCare</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="{{ url_for('client.index') }}" class="logo">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                        <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                        <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                    </svg>
+                </div>
+                <span class="logo-text">DentalCare</span>
+            </a>
+
+            <nav class="nav">
+                <a href="{{ url_for('service.show_services') }}" class="nav-link">Services</a>
+                <a href="{{ url_for('dentist.show_dentists') }}" class="nav-link">Dentists</a>
+                <a href="{{ url_for('visit.visit_history') }}" class="nav-link active">Visit History</a>
+            </nav>
+
+            <div class="auth-buttons">
+                <span style="margin-right: 15px; color: #073F88;">Hello, {{ session.get('client_name', 'Client') }}!</span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-outline">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="services-page">
+        <div class="page-header">
+            <h1 class="page-title">Visit History</h1>
+            <p class="page-subtitle">View and manage your past and upcoming appointments</p>
+        </div>
+
+        <div style="max-width: 1400px; margin: 0 auto;">
+            <form method="GET" action="{{ url_for('visit.visit_history') }}" class="filter-bar" id="filterForm">
+                <div class="filter-grid">
+                    <div style="position: relative;">
+                        <svg style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: rgba(26, 26, 26, 0.5);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <input class="form-input" type="text" name="search" placeholder="Search by dentist name"
+                               style="padding-left: 2.5rem;" value="{{ request.args.get('search', '') }}">
+                    </div>
+
+                    <div style="position: relative;">
+                        <svg style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: rgba(26, 26, 26, 0.5);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <input class="form-input" type="date" name="date" style="padding-left: 2.5rem;"
+                               value="{{ request.args.get('date', '') }}">
+                    </div>
+
+                    <input type="hidden" name="sorting" id="sortingInput" value="{{ request.args.get('sorting', 'desc') }}">
+
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">Search</button>
+                        <button type="button" class="btn btn-outline" id="sortBtn" onclick="toggleSort()">
+                            Sort: {{ 'Oldest' if request.args.get('sorting') == 'asc' else 'Newest' }}
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <div id="visitsList">
+                {% if visits %}
+                    {% for visit in visits %}
+                        <div class="visit-card" style="background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <div class="visit-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div class="visit-info">
+                                    <h3 class="visit-dentist" style="font-size: 1.25rem; font-weight: 700; color: #073F88; margin-bottom: 0.5rem;">
+                                        {{ visit.dentist.name }} {{ visit.dentist.lastname }}
+                                        <span class="badge badge-{{ visit.status|lower }}" style="font-size: 0.75rem; padding: 4px 12px; border-radius: 20px; margin-left: 10px; background: #D0E3ED;">
+                                            {{ visit.status }}
+                                        </span>
+                                    </h3>
+                                    <p style="color: rgba(26, 26, 26, 0.7); margin-bottom: 0.75rem; display: flex; align-items: center;">
+                                        <svg style="width: 16px; height: 16px; margin-right: 0.5rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                                        </svg>
+                                        {{ visit.visit_date.strftime('%A, %d %B %Y') }}
+                                    </p>
+                                    <div>
+                                        <p style="font-size: 0.875rem; color: rgba(26, 26, 26, 0.7); margin-bottom: 0.5rem;">Services:</p>
+                                        <div class="service-tags" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                            {% for service in visit.services %}
+                                                <span class="service-tag" style="background: #f0f4f8; padding: 4px 10px; border-radius: 4px; font-size: 0.875rem;">{{ service.name }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <p style="font-size: 1.25rem; font-weight: 700; color: #073F88; margin-top: 1rem;">
+                                        Total: {{ "%.2f"|format(visit.total_price) }} PLN
+                                    </p>
+                                </div>
+
+                                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                    {% if visit.visit_date > today and visit.status not in ['Cancelled', 'Completed'] %}
+                                        <form method="POST" action="{{ url_for('visit.cancel_visit', visit_id=visit.id) }}">
+                                            <button type="submit" class="btn btn-destructive" style="background: #ff4d4d; color: white; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer;">Cancel</button>
+                                        </form>
+                                    {% endif %}
+
+                                    {% if visit.status in ['Cancelled', 'Completed'] %}
+                                        <form method="POST" action="{{ url_for('visit.delete_visit', visit_id=visit.id) }}">
+                                            <button type="submit" class="btn btn-outline" style="padding: 8px 20px; border-radius: 6px; cursor: pointer;">Delete</button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="card">
+                        <div class="card-content" style="padding: 3rem; text-align: center;">
+                            <p style="font-size: 1.125rem; color: rgba(26, 26, 26, 0.5);">No visits found matching your criteria</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSort() {
+            const sortInput = document.getElementById('sortingInput');
+            sortInput.value = (sortInput.value === 'asc') ? 'desc' : 'asc';
+            document.getElementById('filterForm').submit();
+        }
+    </script>
+</body>
+</html>
