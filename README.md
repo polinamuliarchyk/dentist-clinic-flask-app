@@ -1,7 +1,5 @@
 # DentalCare - Dental Management System
 
-# Django Discussion Forum 
-
 **Author:** Palina Muliarchyk  
 **Project Type:** Pet project
 
