@@ -3,3 +3,4 @@ SQLAlchemy==2.0.48
 greenlet==3.3.2
 typing_extensions==4.15.0
 Flask-Login==0.6.3
+multipledispatch==1.0.0
