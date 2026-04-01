@@ -22,10 +22,16 @@ from models.work_schedule import WorkSchedule
 from users.review import Review
 from users.Enum import ContractEnum
 from users.receptionist import Receptionist
+from datetime import date
+from werkzeug.security import generate_password_hash
+from database import Session
+from users.client import Client
+
 
 app = Flask(__name__)
 
 def create_app():
+    app = Flask(__name__)
     app.secret_key = "your_secret_key"
 
     app.register_blueprint(client_bp)
@@ -36,11 +42,6 @@ def create_app():
 
     return app
 
-
-from datetime import date
-from werkzeug.security import generate_password_hash
-from database import Session
-from users.client import Client
 
 
 def seed_database():
@@ -100,10 +101,10 @@ def seed_database():
     finally:
         db.close()
 
+app = create_app()
 
 if __name__ == "__main__":
     # Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
     seed_database()
-    app = create_app()
     app.run(debug=True)
