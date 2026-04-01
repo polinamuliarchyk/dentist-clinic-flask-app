@@ -2,3 +2,4 @@ Flask==3.1.2
 SQLAlchemy==2.0.48
 greenlet==3.3.2
 typing_extensions==4.15.0
+Flask-Login==0.6.3
