@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, date
 from random import choice
 
-from django.contrib.auth.decorators import login_required
+from flask_login import login_required
 from flask import Blueprint, request, redirect, url_for, render_template, flash, session
 from sqlalchemy.orm import joinedload, contains_eager
 
