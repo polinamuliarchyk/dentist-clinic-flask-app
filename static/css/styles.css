@@ -672,19 +672,26 @@ body {
 }
 
 /* Dentist Card */
+/* Dentist Card Grid */
 .dentists-grid {
-    max-width: 1920px;
-    margin: 0 auto;
+    /* Убираем margin: 0 auto, чтобы сетка не прыгала в центр */
+    margin-left: 5.5cm;
+    margin-right: auto;
+
+    /* Ограничиваем максимальную ширину, чтобы блоки не растягивались до бесконечности */
+    max-width: calc(100% - 4cm);
+
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
     gap: 2rem;
+    padding-right: 2rem; /* Добавляем небольшой отступ справа для красоты */
 }
 
 .dentist-card {
     background: white;
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 1.5rem;
+    padding: 1.5rem; /* Исправил опечатку '1ф.5' на '1.5' */
     transition: box-shadow 0.3s;
 }
 

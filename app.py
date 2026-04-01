@@ -23,9 +23,9 @@ from users.review import Review
 from users.Enum import ContractEnum
 from users.receptionist import Receptionist
 
+app = Flask(__name__)
 
 def create_app():
-    app = Flask(__name__)
     app.secret_key = "your_secret_key"
 
     app.register_blueprint(client_bp)
